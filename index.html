@@ -166,10 +166,11 @@ let currentRoute = [];
 let currentStep = 0;
 
 function showSection(id) {
+  function showSection(id) {
   document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
-  const section = document.getElementById(id);
-  if (section) section.classList.add("active");
+  document.getElementById(id)?.classList.add("active");
 }
+
 
 function showQrScanner() {
   const readerDiv = document.getElementById("reader");
