@@ -172,10 +172,13 @@ function showSection(id) {
 }
 
 function showQrScanner() {
+  const readerDiv = document.getElementById("reader");
+  readerDiv.innerHTML = ""; // ★ここも追加！
+
+  const qrScanner = new Html5Qrcode("reader");
   showSection("qr-scanner-screen");
 
   setTimeout(() => {
-    const qrScanner = new Html5Qrcode("reader");
     qrScanner.start(
       { facingMode: "environment" },
       { fps: 10, qrbox: 300 },
@@ -190,7 +193,6 @@ function showQrScanner() {
       }
     ).catch(err => {
       alert("QR起動に失敗しました：" + err);
-      console.error("起動エラー:", err);
     });
   }, 300);
 }
@@ -244,8 +246,38 @@ function updateNav() {
 }
 
 function scanCheckpoint() {
-  const scanner = new Html5Qrcode("reader");
+  const readerDiv = document.getElementById("reader");
+  readerDiv.innerHTML = "";  // ★毎回初期化！
+
+  const scanner = new Html5Qrcode("reader");  // ★再生成してからスタート！
+
   showSection("qr-scanner-screen");
+
+  setTimeout(() => {
+    scanner.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: 300 },
+      msg => {
+        const [scannedCp, angle] = msg.split(",");
+        scanner.stop().then(() => {
+          const expected = currentRoute[currentStep]?.next;
+          if (scannedCp === expected) {
+            currentStep++;
+            updateNav();
+          } else {
+            showSection("route-error-screen");
+          }
+        });
+      },
+      err => {
+        console.warn("読み取り中:", err);
+      }
+    ).catch(err => {
+      alert("QR起動に失敗しました：" + err);
+    });
+  }, 300);
+}
+
 
   setTimeout(() => {
     scanner.start(
